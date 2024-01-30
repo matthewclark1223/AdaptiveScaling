@@ -1,3 +1,4 @@
+library(tidyverse)
 files<-list.files("./Data/Cleaned/")
 files<-files[grep(".csv",files)] # only incliude csvs. no folders
 files<-files[-which(files[]%in%c("RAMSAR.csv","UNESCO.csv","WorldHeritage.csv","Brazil_RESEX.csv"))]
@@ -48,7 +49,9 @@ FullDat$Intervention<-factor(dplyr::recode(FullDat$Intervention,
                                  "Terrestrial PAs" ,"Tanzania CBFM","Tanzania JFM","Tanzania WMA"))
                         
 FullDat$Adopters<-ifelse(FullDat$Intervention=="Kenya",FullDat$Adopters*1000,FullDat$Adopters)
-
+FullDat$Adopters<-ifelse(FullDat$Intervention=="Chile",
+                         FullDat$Adopters-c(0,0,0,0,1,2,5,20,30,50,59,77,100,107,125,145,171,171),
+                         FullDat$Adopters)
 
 ggplot(FullDat,aes(x=Year,y=Adopters))+geom_point()+
   facet_wrap(~Intervention,scales="free",ncol=4)+
