@@ -70,12 +70,11 @@ ggplot(FullDat,aes(x=Year,y=Adopters))+geom_point()+
 
 
 ###########
-
-FullDat$Intervention<-factor(FullDat$Intervention, levels=c("Philippines","Samoa","Coastal PAs",
-         "Queensland","S. Austraila","Tasmania", "Victoria",
-         "W. Australia", "Kenya","Fiji", 
-         "Solomon Isl.","Marine PAs","Mexico","Namibia",
-         "Terrestrial PAs" ,"Tanzania CBFM","Tanzania JFM","Tanzania WMA","Chile"))
+FullDat$Intervention<-factor(FullDat$Intervention,levels=c("Fiji","Philippines","Samoa","Solomon Isl.","Kenya",
+                                                           "Mexico","Namibia","Tanzania CBFM","Tanzania JFM",
+                                                           "Tanzania WMA", "Queensland","S. Austraila","Tasmania", "Victoria",
+                                                           "W. Australia","Marine PAs",
+                                                           "Coastal PAs","Terrestrial PAs","Chile"))
 
 
 #No shading

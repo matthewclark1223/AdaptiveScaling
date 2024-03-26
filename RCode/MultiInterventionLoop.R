@@ -28,6 +28,8 @@ if((final/sample_n) <0.005 ){ #if less that 0.5%, divide sample by 500
 
 sample_days = ceiling(nrow(df)*0.5) #round up
 
+
+
 # Choose which days the samples were taken. 
 # Ideally this would be daily, but we all know that is difficult.
 #sample_time = sort(sample(1:t_max, sample_days, replace=F))   #run this code if you want random sampling throughout time series
@@ -142,13 +144,13 @@ drawsAll<-rbind(drawsAll,draws)
 
 
 drawsAll<-drawsAll[-1,]
-write.csv(drawsAll,"MultiInterventionPosterior.csv")
+#write.csv(drawsAll,"MultiInterventionPosterior.csv")
 
-#drawsAll<-read.csv("MultiInterventionPosterior.csv")
+drawsAll<-read.csv("MultiInterventionPosterior.csv")
 
 #
 
-addX<-function(dat){
+addX<-function(dat){ #This adds the 'project year'
   dat$X<-1:nrow(dat)
   return(dat)
 }
@@ -172,10 +174,21 @@ drawsAll<-merge(drawsAll,Sample_Days,by="Intervention")
 drawsAll<-drawsAll%>%filter(Intervention != "Brazil")
 FullDat<-FullDat%>%filter(Intervention != "Brazil")
 
-drawsAll$Intervention<-factor(drawsAll$Intervention,levels=c("Philippines","Samoa","Coastal PAs","Queensland","S. Austraila","Tasmania", "Victoria",
-                                                             "W. Australia","Brazil", "Kenya","Fiji", 
-                                                             "Solomon Isl.","Marine PAs","Mexico","Namibia",
-                                                             "Terrestrial PAs" ,"Tanzania CBFM","Tanzania JFM","Tanzania WMA"))
+#drawsAll$Intervention<-factor(drawsAll$Intervention,levels=c("Philippines","Samoa","Coastal PAs","Queensland","S. Austraila","Tasmania", "Victoria",
+                                                           #  "W. Australia","Brazil", "Kenya","Fiji", 
+                                                           #  "Solomon Isl.","Marine PAs","Mexico","Namibia",
+                                                           #  "Terrestrial PAs" ,"Tanzania CBFM","Tanzania JFM","Tanzania WMA"))
+
+drawsAll$Intervention<-factor(drawsAll$Intervention,levels=c("Fiji","Philippines","Samoa","Solomon Isl.","Kenya",
+                                                             "Mexico","Namibia","Tanzania CBFM","Tanzania JFM",
+                                                             "Tanzania WMA", "Queensland","S. Austraila","Tasmania", "Victoria",
+                                                             "W. Australia","Marine PAs",
+                                                             "Coastal PAs","Terrestrial PAs"))
+FullDat$Intervention<-factor(FullDat$Intervention,levels=c("Fiji","Philippines","Samoa","Solomon Isl.","Kenya",
+                                                            "Mexico","Namibia","Tanzania CBFM","Tanzania JFM",
+                                                            "Tanzania WMA", "Queensland","S. Austraila","Tasmania", "Victoria",
+                                                            "W. Australia","Marine PAs",
+                                                            "Coastal PAs","Terrestrial PAs"))
 
 library(scales)
 
@@ -199,12 +212,12 @@ ggplot(drawsAll, aes(x=as.integer(mod_time), y=value2)) +
  # annotate("text", x = 8.5, y = .26, label = "Prediction (MAE: xx%)",color="#252525")+
   ggthemes::theme_clean()+
   xlab("Project year")+#scale_x_continuous(breaks=c(2,6,10))+
-  scale_y_continuous(labels=scales::percent, name="Adoption")+
+  scale_y_continuous(labels=scales::percent,breaks=pretty_breaks(), name="Adoption")+
   scale_x_continuous(breaks=equal_breaks(n=3, s=0.05), 
                      expand = c(0.02, 0))+
-  theme(axis.title = element_text(colour = "black",size=16),
-        axis.text=element_text(color="black",size=10),
-        strip.text = element_text(size=9))
+  theme(axis.title = element_text(colour = "black",size=18),
+        axis.text=element_text(color="black",size=12),
+        strip.text = element_text(size=12,face="bold"))
   
 
 
@@ -235,6 +248,15 @@ ggplot(drawsAll, aes(x=as.integer(mod_time), y=value)) +
 
 Tab<-drawsAll%>%group_by(Intervention)%>%summarise(MAE=median(MAE2))
 
+#trial zone for reorganizing
+
+
+####
+
+
+
+
+
 Chile<-data.frame(Intervention="Chile",MAE=0.024)
 Tab<-rbind(Tab,Chile)
 
@@ -246,11 +268,24 @@ pop$Final<-scales::comma(pop$Final)
 pop$Population<-scales::comma(pop$Population)
 
 Tab<-merge(pop,Tab,by="Intervention")
-names(Tab)[3:4]<-c("Adopters (#)", "Adopters (%)")
+names(Tab)[3:4]<-c("Adopters", "Adopters (%)")
 
 Tab<-Tab[order(Tab$Intervention),]
 rownames(Tab) <- NULL
-Tab %>%mutate(MAE=paste0(round(MAE*100,digits=2),"%"))%>%
+
+
+#Added to change MAE
+Tab$MAECount<-Tab$MAE*as.double(gsub(",","",Tab$Population))
+Tab$MAEPerc<-scales::percent(Tab$MAECount/as.double(gsub(",","",Tab$`Adopters`)))
+Tab$MAECount<-scales::comma(round(Tab$MAECount,digits=0))
+
+names(Tab)[6:7]<-c("MAE (#)", "MAE (%)")
+Tab<-Tab[-c(4:5)]
+
+Tab %>%#mutate(MAE=paste0(round(MAE*100,digits=2),"%"))%>%
  kableExtra::kbl() %>%
   kableExtra::kable_classic_2(full_width = F)
+
+##
+
 

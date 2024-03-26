@@ -143,6 +143,6 @@ length(Observed) == length(mod_median)
 mean(abs(mod_median-Observed))
 
 
+mean(abs(mod_median-Observed)) * 1131
 
-
-
+59.28953/302
