@@ -66,7 +66,7 @@ model {
   S0 ~ normal(0.2, 0.1); //constrained to be 0-1. (0.5,0.3) for multirun
   //global = normal(0.2, 0.1)
 
-  M0 ~ normal(0.5, 0.1); //constrained to be 0-1. 
+  M0 ~ normal(0.8, 0.1); //constrained to be 0-1. 
   
   y ~ binomial(n_sample, y_hat[, 2]); //y_hat[,2] are the fractions infected from the ODE solver
   
